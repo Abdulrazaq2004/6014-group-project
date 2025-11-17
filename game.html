@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyber6014 Game — Play</title>
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="game">
+  <!-- 🔹 Site Header -->
+  <header class="site-header">
+    <div class="header-left">
+      <!-- Return to main page -->
+      <a class="header-btn" href="main.html">Return</a>
+    </div>
+
+    <h1 class="site-title">Cyber6014 Game</h1>
+
+    <div class="header-right profile-menu">
+      <!-- Player profile icon -->
+      <img id="headerProfilePic" class="profile-icon" src="images/default-avatar.png" alt="Profile" />
+
+      <!-- Profile menu dropdown -->
+      <nav id="profileDropdown" class="dropdown">
+        <a href="profile.html">Profile</a>
+        <button id="logoutBtn" type="button" class="danger">Sign Out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 🔹 Main Game Layout -->
+  <main class="game-wrap2">
+    <!-- 🧭 Sidebar (Player Info + Score + Legend) -->
+    <aside class="sidebar-info">
+      <!-- Player profile summary -->
+      <div id="profile-card">
+        <img id="sidebar-profile-pic" src="images/default-avatar.png" alt="Profile Picture" />
+        <div id="current-username"></div>
+        <div class="score-display">
+          Points: <span id="total-score">0</span>
+        </div>
+      </div>
+
+      <!-- Points per difficulty -->
+      <div class="difficulty-legend">
+        <h3>Awards (Points)</h3>
+        <ul class="legend-list">
+          <li>5 <span class="difficulty-level easy">Easy</span></li>
+          <li>10 <span class="difficulty-level medium">Medium</span></li>
+          <li>15 <span class="difficulty-level hard">Hard</span></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- 🕹️ Start Screen: Category Selection -->
+    <section id="start-screen" class="main-content">
+      <h2 class="title">?Ready</h2>
+      <p class="subtitle">Choose a category to start</p>
+
+      <!-- Category Buttons -->
+      <div class="category-grid">
+        <button class="category-btn" data-category="Phishing">Phishing</button>
+        <button class="category-btn" data-category="Passwords">Passwords</button>
+        <button class="category-btn" data-category="Malware">Malware</button>
+        <button class="category-btn" data-category="Social Engineering">Social Engineering</button>
+        <button class="category-btn" data-category="Network Security">Network Security</button>
+        <button class="category-btn" data-category="Web Security">Web Security</button>
+      </div>
+    </section>
+
+    <!-- 🎯 Question Screen -->
+    <section id="question-screen" class="main-content hidden">
+      <div class="question-box">
+        <!-- Category Title -->
+        <h2 id="current-category" class="title" style="margin-bottom:10px;"></h2>
+        
+        <!-- Question Text -->
+        <p id="current-question" class="question-text"></p>
+
+        <!-- Multiple Choice Options -->
+        <div id="options-container" class="options-grid"></div>
+
+        <!-- Feedback Message -->
+        <p id="feedback-message" class="feedback-text" style="min-height:36px;"></p>
+
+        <!-- Buttons: Read More / Next / Back -->
+        <button id="read-more-btn" class="btn-primary hidden" target="_blank">Read More</button>
+        <button id="next-question-btn" class="btn-primary hidden">Next Question</button>
+        <button id="back-btn" class="ghost">Back to Categories</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 🔹 Footer -->
+  <footer class="site-footer">
+    Cyber6014 Game – Developed with love by 6014 group © 2025
+  </footer>
+
+  <!-- 🔹 Scripts -->
+  <script src="questionsData.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

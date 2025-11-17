@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyber6014 Game - Login</title>
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="auth">
+  <!-- 🔹 Header -->
+  <header class="site-header">
+    <h1 class="site-title">Cyber6014 Game</h1>
+  </header>
+
+  <!-- 🔹 Authentication container -->
+  <main class="auth-container">
+    <div class="auth-card" id="authCard">
+      
+      <!-- 🔸 Register Form -->
+      <form id="registerForm" class="auth-form active">
+        <h2>Register</h2>
+        <input type="text" id="regUsername" placeholder="Username" required />
+        <input type="password" id="regPassword" placeholder="Password" required />
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+        <button type="submit" class="btn-primary">Register</button>
+        <p class="switch-text">
+          Already have an account? <span id="switchToLogin">Login</span>
+        </p>
+        <p id="passwordMismatch" class="error-msg"></p>
+      </form>
+
+      <!-- 🔸 Login Form -->
+      <form id="loginForm" class="auth-form">
+        <h2>Login</h2>
+        <input type="text" id="loginUsername" placeholder="Username" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <a href="#" class="forgot-pass">Forgot Password?</a>
+        <button type="submit" class="btn-primary">Login</button>
+        <p class="switch-text">
+          Don’t have an account? <span id="switchToRegister">Register</span>
+        </p>
+        <p id="loginError" class="error-msg"></p>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- 🔹 Footer -->
+  <footer class="site-footer">
+    Cyber6014 Game – Developed with love by 6014 group © 2025
+  </footer>
+
+  <!-- Main Script -->
+  <script src="script.js"></script>
+</body>
+</html>
