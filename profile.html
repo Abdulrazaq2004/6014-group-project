@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cyber6014 Game — Profile</title>
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="profile">
+  <!-- 🔹 Header -->
+  <header class="site-header">
+    <div class="header-left">
+      <!-- Return to main menu -->
+      <a class="header-btn" href="main.html">Return</a>
+    </div>
+
+    <h1 class="site-title">Cyber6014 Game</h1>
+
+    <div class="header-right profile-menu">
+      <!-- Player icon -->
+      <img id="headerProfilePic" class="profile-icon" src="images/default-avatar.png" alt="Profile" />
+
+      <!-- Profile dropdown menu -->
+      <nav id="profileDropdown" class="dropdown">
+        <a href="profile.html">Profile</a>
+        <button id="logoutBtn" type="button" class="danger">Sign Out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 🔹 Profile Panel -->
+  <main class="page-wrap">
+    <div class="panel profile-panel">
+      <h2>Profile</h2>
+
+      <!-- Avatar and image upload -->
+      <div class="profile-block">
+        <img id="profile-pic" src="images/default-avatar.png" alt="Profile Picture" />
+        <div class="profile-actions">
+          <input id="profile-file" type="file" accept="image/*" class="hidden" />
+          <button id="change-pic" type="button">Change Image</button>
+        </div>
+      </div>
+
+      <!-- Username and score display -->
+      <h3>Player: <span id="profile-username"></span></h3>
+      <div>Points: <span id="profile-score" class="badge-score">0</span></div>
+    </div>
+  </main>
+
+  <!-- 🔹 Footer -->
+  <footer class="site-footer">
+    Cyber6014 Game – Developed with love by 6014 group © 2025
+  </footer>
+
+  <!-- 🔹 Scripts -->
+<script src="js/questionsData.js"></script>
+<script src="js/config_and_helpers.js"></script>
+<script src="js/user_manager.js"></script>
+<script src="js/progress_manager.js"></script>
+<script src="js/game_logic.js"></script>
+<script src="js/ui_and_routing.js"></script>
+
+</body>
+</html>
