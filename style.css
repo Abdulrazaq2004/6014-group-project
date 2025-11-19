@@ -445,42 +445,78 @@ button:hover{transform:translateY(-1px);box-shadow:0 0 24px var(--color-primary)
 
 
 /* Category & Difficulty Buttons */
+.difficulty-row {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
 .difficulty-btn {
-  min-width: 220px;
-  padding: 20px 40px;
-  font-size: 1.2rem;
-  border-radius: 12px;
+  position: relative;
+  width: 260px;
+  height: 480px;
+  border-radius: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 40px;
+  font-size: 64px;
+  font-weight: 700;
+  text-transform: lowercase;
+  opacity: 1;
   cursor: pointer;
-  border: none;
-  color: #fff;
-  font-weight: bold;
-  transition: 0.25s ease;
-  margin: 0 15px; /* Spacing between buttons */
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+  transition: 0.25s;
 }
 
-/* Colors matching the site theme */
-.difficulty-btn.easy {
-  background: linear-gradient(145deg, #06cf92, #02917e);
-  box-shadow: 0 0 20px rgba(0, 255, 179, 0.4);
+.difficulty-easy { background:linear-gradient(145deg, #06be87, #02917e); }
+.difficulty-medium { background:linear-gradient(145deg, #e7ae31, #846c0f); }
+.difficulty-hard { background:linear-gradient(145deg, #90102a, #ae0808); }
+
+.locked {
+  filter: grayscale(1) brightness(0.6);
+  cursor: not-allowed;
 }
 
-.difficulty-btn.medium {
-  background: linear-gradient(145deg, #e7ae31, #846c0f); color: white;
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+.difficulty-btn:not(.locked):hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 0 20px rgba(231, 230, 230, 0.35);
 }
 
-.difficulty-btn.hard {
-  background: linear-gradient(145deg, #90102a, #ae0808);
-  box-shadow: 0 0 20px rgba(255, 23, 68, 0.4);
+
+/* text inside the selection box */
+.difficulty-btn span {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 70px;
+    font-weight: 700;
+
+    color: rgba(255, 255, 255, 0.52); /* more visible */
+    
+    letter-spacing: 3px;
+    pointer-events: none;
+    user-select: none;
 }
 
-/* On mouse hover */
-.difficulty-btn:hover {
+.diff-icon {
+  width: 100%;            /* أكبر */
+  max-width: 400px;      /* تكبير الحد الأعلى */
+  margin-top: 100px;      /* تنزل الصورة لتحت أكثر */
+  opacity: 0.45;         /* شفافية أعلى */
+  pointer-events: none;
+  transition: transform 0.35s ease, opacity 0.2s ease;
+}
+
+.difficulty-btn:hover .diff-icon {
   transform: scale(1.08);
-  box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
-  filter: brightness(1.15);
+  opacity: 0.75;         /* تزيد الوضوح عند الهوفر */
 }
+
+
+
+
 
 
 /* Common Styling */
@@ -540,6 +576,9 @@ button:hover{transform:translateY(-1px);box-shadow:0 0 24px var(--color-primary)
   line-height: 1.5; /* Adds breathing room between lines */
   box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
 }
+
+
+
 
 /* Hover glow */
 .option-btn:hover:not([disabled]) {
@@ -862,4 +901,68 @@ button:hover{transform:translateY(-1px);box-shadow:0 0 24px var(--color-primary)
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+
+/* Row layout for difficulty buttons under start screen */
+.difficulty-row {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* space between cards */
+}
+
+
+
+/* Answers Grid (2x2 layout) */
+.answers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 40px;
+  width: 90%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.option-btn {
+  padding: 25px;
+  font-size: 22px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.option-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.02);
+}
+
+.correct-answer {
+  background: #00c777 !important;
+}
+
+.wrong-answer {
+  background: #c70039 !important;
+}
+
+.next-question-btn {
+  background:transparent;
+  color:var(--color-text);
+  border:2px solid rgba(255,255,255,.15)
+}
+
+.next-question-btn:hover {
+  background:rgba(255,255,255,.06);
+  color:var(--color-primary);
+  border-color:var(--color-primary)
+}
+
+.hidden {
+  display: none !important;
 }

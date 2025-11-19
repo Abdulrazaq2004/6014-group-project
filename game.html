@@ -55,10 +55,12 @@
       </div>
     </aside>
 
-    <!-- 🕹️ Start Screen: Category Selection -->
+    <!-- 🕹️ Start Screen: Category Selection + Difficulty Selection -->
     <section id="start-screen" class="main-content">
-      <h2 class="title">?Ready</h2>
-      <p class="subtitle">Choose a category to start</p>
+      <div id="start-intro">
+        <h2 class="title">?Ready</h2>
+        <p class="subtitle">Choose a category to start</p>
+      </div>
 
       <!-- Category Buttons -->
       <div class="category-grid">
@@ -69,7 +71,39 @@
         <button class="category-btn" data-category="Network Security">Network Security</button>
         <button class="category-btn" data-category="Web Security">Web Security</button>
       </div>
+
+      <!-- Difficulty Selection (shown AFTER picking a category) -->
+      <div id="difficulty-section" class="hidden" style="margin-top: 32px;">
+        <h3 class="subtitle" id="selected-category-label">
+          <!-- filled by JS, e.g. "Phishing - choose difficulty" -->
+        </h3>
+
+              <div id="difficulty-selection" class="difficulty-row">
+
+          <div class="difficulty-btn difficulty-easy" data-diff="easy">
+              <span>easy</span>
+              <img src="images/easy.png" class="diff-icon">
+          </div>
+
+          <div class="difficulty-btn difficulty-medium locked" data-diff="medium">
+              <span>medium</span>
+              <img src="images/mid.png" class="diff-icon">
+          </div>
+
+          <div class="difficulty-btn difficulty-hard locked" data-diff="hard">
+              <span>hard</span>
+              <img src="images/hard.png" class="diff-icon">
+          </div>
+
+      </div>
+
+
+        <button id="back-to-cats" class="ghost" style="margin-top:18px;">
+          ⬅ Back to categories
+        </button>
+      </div>
     </section>
+
 
     <!-- 🎯 Question Screen -->
     <section id="question-screen" class="main-content hidden">
@@ -81,15 +115,21 @@
         <p id="current-question" class="question-text"></p>
 
         <!-- Multiple Choice Options -->
-        <div id="options-container" class="options-grid"></div>
+        <!-- 2x2 Answers Grid -->
+        <div id="answers-area" class="answers-grid">
+        </div>
+
+        <!-- Next Question Button -->
+        
+
 
         <!-- Feedback Message -->
         <p id="feedback-message" class="feedback-text" style="min-height:36px;"></p>
 
         <!-- Buttons: Read More / Next / Back -->
         <button id="read-more-btn" class="btn-primary hidden" target="_blank">Read More</button>
-        <button id="next-question-btn" class="btn-primary hidden">Next Question</button>
-        <button id="back-btn" class="ghost">Back to Categories</button>
+        <button id="next-question-btn" class="next-question-btn hidden">Continue</button> 
+        <button id="back-btn" class="ghost">Categories</button>
       </div>
     </section>
   </main>

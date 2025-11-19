@@ -19,27 +19,67 @@ let attemptNumber = 1; // attempt count for the current level (used for retries)
 function renderCategories() {
   const container = $('#start-screen .category-grid');
   if (!container) return;
-  container.innerHTML = '';
-  const cats = getAllCategoriesFromQuestions();
 
-  if (!cats.length) {
-    container.textContent = 'No categories available yet.';
-    return;
-  }
+  // Use existing buttons from HTML (don’t recreate)
+  const btns = container.querySelectorAll('.category-btn');
+  if (!btns.length) return;
 
-  cats.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'category-btn';
-    // Capitalize first letter
-    btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-    btn.dataset.category = cat;
+  btns.forEach(btn => {
     btn.addEventListener('click', () => {
-      currentCategory = cat;
-  // Always start automatically at Easy level
-      startAttemptFor(cat, "easy");
+      const cat = btn.dataset.category;
+      if (!cat) return;
+      openDifficultySelection(cat);
     });
+  });
+}
 
-    container.appendChild(btn);
+
+/** Shows difficulty buttons for the chosen category. */
+function openDifficultySelection(category) {
+  currentCategory = category;
+
+  const startScreen   = $('#start-screen');
+  const questionScreen = $('#question-screen');
+  if (questionScreen) questionScreen.classList.add('hidden');
+  if (startScreen)    startScreen.classList.remove('hidden');
+
+  const catGrid   = $('#start-screen .category-grid');
+  const diffBlock = $('#difficulty-section');
+  const label     = $('#selected-category-label');
+
+  $('#start-intro')?.classList.add('hidden');
+
+  if (catGrid)   catGrid.classList.add('hidden');
+  if (diffBlock) diffBlock.classList.remove('hidden');
+  if (label) {
+    label.textContent = `${category} — choose difficulty`;
+    label.style.fontSize = "1.5rem"; // <--- Add this line
+  }
+  
+  updateDifficultyButtons();
+}
+
+/** Locks/unlocks difficulty buttons based on saved progress. */
+function updateDifficultyButtons() {
+  const username = getCurrentUser();
+  if (!username || !currentCategory) return;
+
+  const progress = loadUserProgress(username); // from progress_manager.js
+  const unlocked = progress[currentCategory] || ['easy']; // default at least easy
+
+  const order = ['easy', 'medium', 'hard'];
+  order.forEach(d => {
+    const btn = document.querySelector(`.difficulty-btn[data-diff="${d}"]`);
+    if (!btn) return;
+
+    if (unlocked.includes(d) || d === 'easy') {
+      btn.classList.remove('locked');
+      btn.disabled = false;
+      btn.style.filter = '';
+    } else {
+      btn.classList.add('locked');
+      btn.disabled = true;
+    }
   });
 }
 
@@ -87,196 +127,187 @@ function showQuestionScreen() {
 function displayCurrentQuestion() {
   if (!currentAttemptQuestions.length) return;
   if (currentQuestionIndex >= currentAttemptQuestions.length) {
-    // Attempt finished -> evaluate
     finalizeAttempt();
     return;
   }
 
   currentQuestionObj = currentAttemptQuestions[currentQuestionIndex];
 
-  // Render question text & options
-  const qEl = $('#current-question');
-  const cont = $('#options-container');
-  const fb = $('#feedback-message');
-  if (qEl) qEl.textContent = currentQuestionObj.question_text || '';
-  if (fb) { fb.textContent = ''; fb.classList.remove('wrong'); }
+  $('#current-question').textContent = currentQuestionObj.question_text;
 
-  if (cont) {
-    cont.innerHTML = '';
-    const opts = [...currentQuestionObj.options];
-    shuffleInPlace(opts);
-    opts.forEach(opt => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'option-btn';
-      b.dataset.answer = opt;
-      b.textContent = opt;
-      cont.appendChild(b);
-    });
-  }
+  const answersArea = $('#answers-area');
+  answersArea.innerHTML = '';
+
+  const fb = $('#feedback-message');
+  fb.textContent = '';
+  fb.classList.remove('wrong');
+
+  const opts = [...currentQuestionObj.options];
+  shuffleInPlace(opts);
+
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.dataset.answer = opt;
+    btn.textContent = opt;
+    answersArea.appendChild(btn);
+  });
+
+  // Hide Next button until user answers
+  $('#next-question-btn').classList.add('hidden');
 }
 
-/** Evaluates the attempt (after 3 questions) and shows the result screen. */
+
+/** Finalizes the attempt: checks pass/fail and shows feedback. */
+
 function finalizeAttempt() {
-  const success = currentAttemptCorrect >= 2;
-  const user = getCurrentUser();
+  const success = currentAttemptCorrect >= 2; // pass if 2/3 correct
+  const username = getCurrentUser();
   const fb = $('#feedback-message');
 
+  // Hide any old popups if they exist
   $('#feedback-popup')?.classList.add('hidden');
   $('#incident-screen')?.classList.add('hidden');
 
   if (success) {
+    // --- SUCCESS PATH ---
+    
+    // Determine next difficulty
     const order = ['easy', 'medium', 'hard'];
     const idx = order.indexOf(currentDifficulty);
     const next = (idx >= 0 && idx < order.length - 1) ? order[idx + 1] : null;
 
-    // افتح الصعوبة التالية فقط بدون أي انتقال تلقائي
-    if (next) unlockDifficulty(user, currentCategory, next);
-
-    // فعّل الزر الخاص بالصعوبة الجديدة
-    const diffBtns = document.querySelectorAll('.difficulty-btn');
-    diffBtns.forEach(b => {
-      if (b.dataset.diff === next) {
-        b.classList.remove('locked');
-        b.disabled = false;
-        b.style.filter = 'none';
-        b.style.boxShadow = '0 0 16px #00ff99';
-      }
-    });
-
-    // عرض رسالة نجاح واضحة فقط
-    if (fb) {
-      fb.classList.remove('wrong');
-      fb.innerHTML = `✅ Excellent! You passed this level.<br>Next difficulty unlocked — choose it manually when ready.`;
+    // Unlock next difficulty in progress store
+    if (next && username) {
+      unlockDifficulty(username, currentCategory, next); // from progress_manager.js
     }
 
-    // إبقاء الشاشة الحالية بدون تنقل أو طبقات
-    $('#question-screen')?.classList.remove('hidden');
-    $('#start-screen')?.classList.add('hidden');
-    document.body.style.overflow = "auto";
+    // Nice success message
+    if (fb) {
+      fb.classList.remove('wrong');
+      fb.style.color = ''; // Reset color
+      fb.innerHTML = `Excellent! Next difficulty is unlocked`;
+    }
+
 
   } else {
-    // في حالة الفشل فقط
+    // --- FAILURE PATH ---
+
+    // 1. Show Red Text Feedback
+    if (fb) {
+      fb.classList.add('wrong');
+      fb.style.color = 'red';
+      fb.innerHTML = `You failed. Try again!`;
+    }
+
+    // 2. Show incident info
     $('#incident-screen')?.classList.remove('hidden');
-    const t = $('#incident-title'),
-      d = $('#incident-details');
-    if (t) t.textContent = `Topic: ${currentQuestionObj.incident_title}`;
-    if (d) d.innerHTML = `<p>${currentQuestionObj.incident_details}</p>`;
+    const t = $('#incident-title');
+    const d = $('#incident-details');
+    if (t) t.textContent = `Topic: ${currentQuestionObj?.incident_title || 'Incident'}`;
+    if (d) d.innerHTML = `<p>${currentQuestionObj?.incident_details || ''}</p>`;
   }
 }
 
 
+
+/** Initializes the Game page (UI, sidebar, event listeners). */
 /** Initializes the Game page (UI, sidebar, event listeners). */
 function initGamePage(current) {
   const user = findUser(current);
-  if (!user) { saveCurrentUser(null); window.location.href = 'index.html'; return; }
+  if (!user) {
+    saveCurrentUser(null);
+    window.location.href = 'index.html';
+    return;
+  }
 
   currentUserGlobal = current;
   setHeaderProfileImage(current);
   initHeader();
 
   // Sidebar info
-  const nameEl  = $('#current-username');
-  const scoreEl = $('#total-score');
-  if (nameEl)  nameEl.textContent  = user.username;
-  if (scoreEl) scoreEl.textContent = user.score || 0;
+  $('#current-username').textContent = user.username;
+  $('#total-score').textContent = user.score || 0;
 
   const sidePic = $('#sidebar-profile-pic');
-  if (sidePic && current) {
+  if (sidePic) {
     const storedImg = localStorage.getItem(profileImgKey(current));
     sidePic.src = storedImg || DEFAULT_AVATAR;
   }
 
-  // Prepare categories selection UI
+  // Render categories
   renderCategories();
 
-  // Options click handler (answers)
-  const cont = $('#options-container');
-  if (cont) {
-    cont.addEventListener('click', (e) => {
-      const btn = e.target.closest('button[data-answer]');
+  // ============================================
+  //  2×2 ANSWERS CLICK HANDLER (NO AUTO NEXT)
+  // ============================================
+  const answersArea = $('#answers-area');
+  const nextBtn = $('#next-question-btn');
+
+  if (answersArea) {
+    answersArea.addEventListener('click', (e) => {
+      const btn = e.target.closest('.option-btn');
       if (!btn || !currentQuestionObj || btn.disabled) return;
 
-      const ans = btn.dataset.answer;
-      const correct = ans === currentQuestionObj.correct_answer;
-      btn.disabled = true;
+      const correct = btn.dataset.answer === currentQuestionObj.correct_answer;
+
+      // Disable all buttons
+      $$('.option-btn').forEach(b => b.disabled = true);
 
       if (correct) {
         btn.classList.add('correct-answer');
         currentAttemptCorrect++;
-        // Award points immediately
+
         const newScore = updateUserScore(current, currentQuestionObj.points);
-        if (scoreEl) scoreEl.textContent = newScore;
-        
-        // Show short message
+        $('#total-score').textContent = newScore;
+
+        // --- FIX STARTS HERE ---
         const fb = $('#feedback-message');
-        if (fb) {
-          fb.classList.remove('wrong');
-          fb.innerHTML = `<span style="color:#00ff99;">✅ Correct!</span> <br> +${currentQuestionObj.points} points`;
-        }
+        fb.style.color = '#00ff99';   // <--- Force the whole container to be Green
+        fb.classList.remove('wrong'); // Remove error class if present
         
-        // Disable other buttons for this question
-        $$('.option-btn').forEach(b => b.disabled = true);
-        
-        // Move to next question after delay
-        setTimeout(() => {
-          currentQuestionIndex++;
-          $('#options-container')?.classList.remove('hidden');
-          displayCurrentQuestion();
-        }, 750);
+        // Now both lines will be green
+        fb.innerHTML = `Correct! +${currentQuestionObj.points} points`; 
+        // --- FIX ENDS HERE ---
+
       } else {
         btn.classList.add('wrong-answer');
-        
-        // Show wrong message
-        const fb = $('#feedback-message');
-        if (fb) {
-          fb.classList.add('wrong');
-          fb.innerHTML = `<span style="color:#ff4444;">❌ Wrong answer!</span> Keep going...`;
-        }
-        
-        // Disable all options for this question and move to next question after delay
-        $$('.option-btn').forEach(b => b.disabled = true);
-        setTimeout(() => {
-          currentQuestionIndex++;
-          displayCurrentQuestion();
-        }, 900);
+
+        $('#feedback-message').innerHTML =
+          `<span style="color:#ff4444;">Wrong answer!</span>`;
       }
+
+      // SHOW NEXT BUTTON
+      nextBtn.classList.remove('hidden');
     });
   }
 
-  // Feedback popup actions (continue / retry)
-  // Action after a successful attempt
-  $('#next-question-btn')?.addEventListener('click', () => {
-    $('#feedback-popup')?.classList.add('hidden');
-    $('#incident-screen')?.classList.add('hidden');
+  // ============================================
+  //   NEXT QUESTION BUTTON
+  // ============================================
+  nextBtn?.addEventListener('click', () => {
+    nextBtn.classList.add('hidden');
+    $('#feedback-message').textContent = "";
 
-    
-    // Go back to the main category selection screen
-    const questionScreen = $('#question-screen');
-    const startScreen = $('#start-screen');
-    if (questionScreen) questionScreen.classList.add('hidden');
-    if (startScreen) {
-      startScreen.classList.remove('hidden');
-      renderCategories();
-    }
+    currentQuestionIndex++;
+    displayCurrentQuestion();
   });
-  
-  // Show incident details (after a failed attempt)
+
+  // ============================================
+  // POPUP ACTIONS (keep as-is)
+  // ============================================
   $('#show-incident-btn')?.addEventListener('click', () => {
     if (!currentQuestionObj) return;
-    // Details are set in finalizeAttempt, just switch screens
     $('#feedback-popup')?.classList.add('hidden');
     $('#incident-screen')?.classList.remove('hidden');
   });
-  
-  // Open external article link
+
   $('#show-article-btn')?.addEventListener('click', () => {
-    if (currentQuestionObj?.article_link) window.open(currentQuestionObj.article_link, '_blank');
+    if (currentQuestionObj?.article_link)
+      window.open(currentQuestionObj.article_link, '_blank');
   });
 
-  // Retry the level (after a failed attempt)
   $('#continue-game-btn')?.addEventListener('click', () => {
-    // Retry: prepare a new set of 3 questions for the same category/diff
     attemptNumber++;
     prepareAttemptQuestions();
     $('#feedback-popup')?.classList.add('hidden');
@@ -284,17 +315,53 @@ function initGamePage(current) {
     displayCurrentQuestion();
   });
 
-  // Hide popups on initial load
   $('#feedback-popup')?.classList.add('hidden');
   $('#incident-screen')?.classList.add('hidden');
 
-    // 🧭 Back button to return to the category screen
+  // ============================================
+  // BACK BUTTONS
+  // ============================================
   $('#back-btn')?.addEventListener('click', () => {
-    const questionScreen = $('#question-screen');
-    const startScreen = $('#start-screen');
-
-    if (questionScreen) questionScreen.classList.add('hidden');
-    if (startScreen) startScreen.classList.remove('hidden');
+    $('#question-screen')?.classList.add('hidden');
+    $('#start-screen')?.classList.remove('hidden');
+    $('#start-screen .category-grid')?.classList.remove('hidden');
+    $('#difficulty-section')?.classList.add('hidden');
   });
+
+  $('#back-to-cats')?.addEventListener('click', () => {
+    $('#start-screen .category-grid')?.classList.remove('hidden');
+    $('#difficulty-section')?.classList.add('hidden');
+    $('#start-intro')?.classList.remove('hidden');
+    currentCategory = null;
+  });
+
+  // ============================================
+  // DIFFICULTY BUTTONS
+  // ============================================
+  $$('.difficulty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('locked')) return;
+      const diff = btn.dataset.diff;
+      if (!diff || !currentCategory) return;
+      startAttemptFor(currentCategory, diff);
+    });
+  });
+
+
+function showDifficultySelector(category) {
+    const diffSelector = document.getElementById("difficultySelector");
+    diffSelector.classList.remove("hidden");
+
+    const unlocked = loadUserProgress(currentUser)[category] || ["easy"];
+
+    const btnEasy   = document.querySelector('.difficulty-easy');
+    const btnMed    = document.querySelector('.difficulty-medium');
+    const btnHard   = document.querySelector('.difficulty-hard');
+
+    btnEasy.classList.remove("locked");
+    btnMed.classList.toggle("locked", !unlocked.includes("medium"));
+    btnHard.classList.toggle("locked", !unlocked.includes("hard"));
+}
+
 
 }
