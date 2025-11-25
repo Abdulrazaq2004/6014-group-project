@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cyber6014 — Profile</title>
+
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="profile">
+  <!-- 🔹 Header -->
+  <header class="site-header">
+    <div class="header-left">
+      <!-- Return to main menu -->
+      <a class="header-btn" href="main.html">Return</a>
+    </div>
+
+    <h1 class="site-title">Cyber6014</h1>
+
+    <div class="header-right profile-menu">
+      <!-- Player icon -->
+      <img id="headerProfilePic" class="profile-icon" src="images/default-avatar.png" alt="Profile" />
+
+      <!-- Profile dropdown menu -->
+      <nav id="profileDropdown" class="dropdown">
+        <a href="profile.html">Profile</a>
+        <button id="logoutBtn" type="button" class="danger">Sign Out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 🔹 Profile Panel -->
+<main class="page-wrap">
+    <div class="profile-card-container">
+      
+      <div class="profile-header-bg"></div>
+      
+      <div class="profile-content">
+        <div class="profile-avatar-section">
+          <div class="avatar-wrapper">
+            <img id="profile-pic" src="images/default-avatar.png" alt="Profile Picture" />
+            <button id="change-pic" class="edit-btn" title="Change Image">
+              ✏️
+            </button>
+          </div>
+          <input id="profile-file" type="file" accept="image/*" class="hidden" />
+          
+          <h2 id="profile-username" class="username-display">Player</h2>
+          <p class="user-rank">Cyber Security Rookie</p> </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">Total Score</span>
+            <span id="profile-score" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Games Played</span>
+            <span id="profile-games-played" class="stat-value">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Rank</span>
+            <span id="profile-rank" class="stat-value">#--</span>
+          </div>
+        </div>
+
+        <div class="profile-actions-row">
+            <a href="main.html" class="btn-secondary">Back to Menu</a>
+            </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- 🔹 Footer -->
+  <footer class="site-footer">
+    Cyber6014 – Developed with love by 6014 group © 2025
+  </footer>
+
+  <!-- 🔹 Scripts -->
+<script src="js/questionsData.js"></script>
+<script src="js/config_and_helpers.js"></script>
+<script src="js/user_manager.js"></script>
+<script src="js/progress_manager.js"></script>
+<script src="js/game_logic.js"></script>
+<script src="js/ui_and_routing.js"></script>
+
+</body>
+</html>
