@@ -3,27 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cyber6014 Game — Play</title>
+  <title>Cyber6014 — Play</title>
 
-  <!-- Global Styles -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body data-page="game">
-  <!-- 🔹 Site Header -->
   <header class="site-header">
     <div class="header-left">
-      <!-- Return to main page -->
       <a class="header-btn" href="main.html">Return</a>
     </div>
 
-    <h1 class="site-title">Cyber6014 Game</h1>
+    <h1 class="site-title">Cyber6014</h1>
 
     <div class="header-right profile-menu">
-      <!-- Player profile icon -->
       <img id="headerProfilePic" class="profile-icon" src="images/default-avatar.png" alt="Profile" />
-
-      <!-- Profile menu dropdown -->
       <nav id="profileDropdown" class="dropdown">
         <a href="profile.html">Profile</a>
         <button id="logoutBtn" type="button" class="danger">Sign Out</button>
@@ -31,20 +30,16 @@
     </div>
   </header>
 
-  <!-- 🔹 Main Game Layout -->
   <main class="game-wrap2">
-    <!-- 🧭 Sidebar (Player Info + Score + Legend) -->
     <aside class="sidebar-info">
-      <!-- Player profile summary -->
       <div id="profile-card">
         <img id="sidebar-profile-pic" src="images/default-avatar.png" alt="Profile Picture" />
-        <div id="current-username"></div>
+        <div id="current-username">Loading...</div>
         <div class="score-display">
           Points: <span id="total-score">0</span>
         </div>
       </div>
 
-      <!-- Points per difficulty -->
       <div class="difficulty-legend">
         <h3>Awards (Points)</h3>
         <ul class="legend-list">
@@ -55,12 +50,12 @@
       </div>
     </aside>
 
-    <!-- 🕹️ Start Screen: Category Selection -->
     <section id="start-screen" class="main-content">
-      <h2 class="title">?Ready</h2>
-      <p class="subtitle">Choose a category to start</p>
+      <div id="start-intro">
+        <h2 class="title">?Ready</h2>
+        <p class="subtitle">Choose a category to start</p>
+      </div>
 
-      <!-- Category Buttons -->
       <div class="category-grid">
         <button class="category-btn" data-category="Phishing">Phishing</button>
         <button class="category-btn" data-category="Passwords">Passwords</button>
@@ -69,44 +64,55 @@
         <button class="category-btn" data-category="Network Security">Network Security</button>
         <button class="category-btn" data-category="Web Security">Web Security</button>
       </div>
+
+      <div id="difficulty-section" class="hidden" style="margin-top: 32px;">
+        <h3 class="subtitle" id="selected-category-label"></h3>
+
+        <div id="difficulty-selection" class="difficulty-row">
+          <div class="difficulty-btn difficulty-easy" data-diff="easy">
+              <span>easy</span>
+              <img src="images/easy.png" class="diff-icon">
+          </div>
+          <div class="difficulty-btn difficulty-medium locked" data-diff="medium">
+              <span>medium</span>
+              <img src="images/mid.png" class="diff-icon">
+          </div>
+          <div class="difficulty-btn difficulty-hard locked" data-diff="hard">
+              <span>hard</span>
+              <img src="images/hard.png" class="diff-icon">
+          </div>
+        </div>
+
+        <button id="back-to-cats" class="ghost" style="margin-top:18px;">
+          ⬅ Back to categories
+        </button>
+      </div>
     </section>
 
-    <!-- 🎯 Question Screen -->
     <section id="question-screen" class="main-content hidden">
       <div class="question-box">
-        <!-- Category Title -->
         <h2 id="current-category" class="title" style="margin-bottom:10px;"></h2>
-        
-        <!-- Question Text -->
         <p id="current-question" class="question-text"></p>
 
-        <!-- Multiple Choice Options -->
-        <div id="options-container" class="options-grid"></div>
+        <div id="answers-area" class="answers-grid"></div>
 
-        <!-- Feedback Message -->
         <p id="feedback-message" class="feedback-text" style="min-height:36px;"></p>
 
-        <!-- Buttons: Read More / Next / Back -->
-        <button id="read-more-btn" class="btn-primary hidden" target="_blank">Read More</button>
-        <button id="next-question-btn" class="btn-primary hidden">Next Question</button>
-        <button id="back-btn" class="ghost">Back to Categories</button>
+        <button id="next-question-btn" class="next-question-btn hidden">Continue</button> 
+        <button id="back-btn" class="ghost">Categories</button>
       </div>
     </section>
   </main>
 
-  <!-- 🔹 Footer -->
   <footer class="site-footer">
-    Cyber6014 Game – Developed with love by 6014 group © 2025
+    Cyber6014 – Developed with love by 6014 group © 2025
   </footer>
 
-  <!-- 🔹 Scripts -->
-
-<script src="js/questionsData.js"></script>
-<script src="js/config_and_helpers.js"></script>
-<script src="js/user_manager.js"></script>
-<script src="js/progress_manager.js"></script>
-<script src="js/game_logic.js"></script>
-<script src="js/ui_and_routing.js"></script>
-
+  <script src="js/questionsData.js"></script>
+  <script src="js/config_and_helpers.js"></script>
+  <script src="js/user_manager.js"></script>
+  <script src="js/progress_manager.js"></script>
+  <script src="js/game_logic.js"></script>
+  <script src="js/ui_and_routing.js"></script>
 </body>
 </html>

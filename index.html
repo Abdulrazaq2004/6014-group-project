@@ -3,28 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cyber6014 Game - Login</title>
+  <title>Cyber6014 - Login</title>
 
-  <!-- Main stylesheet -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body data-page="auth">
-  <!-- 🔹 Header -->
-  <header class="site-header">
-    <h1 class="site-title">Cyber6014 Game</h1>
+    <header class="site-header">
+    <h1 class="site-title">Cyber6014</h1>
   </header>
 
-  <!-- 🔹 Authentication container -->
   <main class="auth-container">
     <div class="auth-card" id="authCard">
       
-      <!-- 🔸 Register Form -->
       <form id="registerForm" class="auth-form active">
         <h2>Register</h2>
+        <input type="email" id="regEmail" placeholder="Email Address" required />
         <input type="text" id="regUsername" placeholder="Username" required />
         <input type="password" id="regPassword" placeholder="Password" required />
         <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+        
         <button type="submit" class="btn-primary">Register</button>
         <p class="switch-text">
           Already have an account? <span id="switchToLogin">Login</span>
@@ -32,12 +35,13 @@
         <p id="passwordMismatch" class="error-msg"></p>
       </form>
 
-      <!-- 🔸 Login Form -->
       <form id="loginForm" class="auth-form">
         <h2>Login</h2>
-        <input type="text" id="loginUsername" placeholder="Username" required />
+        <input type="text" id="loginUsername" placeholder="Username or Email" required />
         <input type="password" id="loginPassword" placeholder="Password" required />
-        <a href="#" class="forgot-pass">Forgot Password?</a>
+        
+        <a href="#" id="forgotPassLink" class="forgot-pass">Forgot Password?</a>
+        
         <button type="submit" class="btn-primary">Login</button>
         <p class="switch-text">
           Don’t have an account? <span id="switchToRegister">Register</span>
@@ -48,18 +52,15 @@
     </div>
   </main>
 
-  <!-- 🔹 Footer -->
   <footer class="site-footer">
-    Cyber6014 Game | 2024
+    Cyber6014 – Developed with love by 6014 group © 2025
   </footer>
   
-  <!-- 🔹 Scripts: questionsData.js must load before script.js -->
-<script src="js/questionsData.js"></script>
-<script src="js/config_and_helpers.js"></script>
-<script src="js/user_manager.js"></script>
-<script src="js/progress_manager.js"></script>
-<script src="js/game_logic.js"></script>
-<script src="js/ui_and_routing.js"></script>
-
+  <script src="js/questionsData.js"></script>
+  <script src="js/config_and_helpers.js"></script>
+  <script src="js/user_manager.js"></script>
+  <script src="js/progress_manager.js"></script>
+  <script src="js/game_logic.js"></script>
+  <script src="js/ui_and_routing.js"></script>
 </body>
 </html>
