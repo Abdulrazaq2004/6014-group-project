@@ -1,184 +1,237 @@
 /* ================================
-   CYBER6014 GAME - UI & ROUTING
+   CYBER6014 GAME - UI & ROUTING (FIXED)
    ================================ */
+
+// Global flag to prevent premature redirects during registration
+let isRegistering = false;
 
 /* ---------------- Header (shared UI) ---------------- */
 
-/** Sets the profile image in the main header. */
-function setHeaderProfileImage(currentUser) {
+function setHeaderProfileImage(user) {
   const img = $('#headerProfilePic');
   if (!img) return;
-  if (!currentUser) {
+  if (user && user.photoURL) {
+    img.src = user.photoURL;
+    img.classList.remove('hidden');
+  } else {
     img.src = DEFAULT_AVATAR;
-    return;
+    if(!user) img.classList.add('hidden');
   }
-  const stored = localStorage.getItem(profileImgKey(currentUser));
-  img.src = stored || DEFAULT_AVATAR;
 }
 
-/** Initializes header logic (profile dropdown and logout). */
-function initHeader() {
-  const current = getCurrentUser();
+function initHeader(user) {
   const img     = $('#headerProfilePic');
   const menu    = $('#profileDropdown');
   const logout  = $('#logoutBtn');
 
-  setHeaderProfileImage(current);
+  setHeaderProfileImage(user);
 
   // Toggle profile dropdown menu
   if (img && menu) {
-    img.addEventListener('click', (e) => {
+    const newImg = img.cloneNode(true);
+    img.parentNode.replaceChild(newImg, img);
+    
+    newImg.addEventListener('click', (e) => {
       e.stopPropagation();
       menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
     });
-    // Close menu when clicking outside
     window.addEventListener('click', (e) => {
-      if (!img.contains(e.target) && !menu.contains(e.target)) menu.style.display = 'none';
+      if (!newImg.contains(e.target) && !menu.contains(e.target)) menu.style.display = 'none';
     });
   }
 
   // Handle logout
   if (logout) {
-    logout.addEventListener('click', () => {
-      saveCurrentUser(null);
-      setHeaderProfileImage(null);
-      window.location.href = 'index.html'; // Redirect to auth/index page
+    const newLogout = logout.cloneNode(true);
+    logout.parentNode.replaceChild(newLogout, logout);
+    
+    newLogout.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     });
   }
 }
 
-/* ---------------- Auth Page (Login/Register) ---------------- */
+/* ---------------- Auth Page ---------------- */
 
 function initAuthPage() {
-  // If already logged in, redirect to main page
-  if (getCurrentUser()) { window.location.href = 'main.html'; return; }
-
-  setHeaderProfileImage(null);
-  initHeader();
-
   const registerForm     = document.getElementById('registerForm');
   const loginForm        = document.getElementById('loginForm');
   const switchToLogin    = document.getElementById('switchToLogin');
   const switchToRegister = document.getElementById('switchToRegister');
-  const passwordMismatch = document.getElementById('passwordMismatch'); // Used for all registration errors
+  const passwordMismatch = document.getElementById('passwordMismatch');
+  const loginError       = document.getElementById('loginError');
+  const forgotLink       = document.getElementById('forgotPassLink');
 
-  // Switch between login and register forms
+  // Switch forms
   switchToLogin?.addEventListener('click', () => {
     registerForm.classList.remove('active');
     loginForm.classList.add('active');
-    passwordMismatch.textContent = ''; // Clear error message
+    if(passwordMismatch) passwordMismatch.textContent = '';
   });
   switchToRegister?.addEventListener('click', () => {
     loginForm.classList.remove('active');
     registerForm.classList.add('active');
-    document.getElementById('loginError').textContent = ''; // Clear login error
+    if(loginError) loginError.textContent = '';
   });
 
-  // Handle registration submission
-  registerForm?.addEventListener('submit', (e) => {
+  // Handle Registration
+  registerForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    passwordMismatch.textContent = ''; // Clear previous error
-    const username = document.getElementById('regUsername').value.trim();
-    const pass1 = document.getElementById('regPassword').value.trim();
-    const pass2 = document.getElementById('confirmPassword').value.trim();
+    
+    // 1. SET FLAG TO TRUE to stop onAuthStateChanged from redirecting early
+    isRegistering = true;
 
-    const englishRegex = /^[A-Za-z0-9_]+$/;
-    if (!englishRegex.test(username)) {
-      passwordMismatch.textContent = 'Username must contain only English letters, numbers, or underscores.';
+    if(passwordMismatch) {
+        passwordMismatch.textContent = 'Creating account...';
+        passwordMismatch.style.color = '#ff6f61';
+    }
+    
+    const email    = document.getElementById('regEmail').value.trim();
+    const username = document.getElementById('regUsername').value.trim();
+    const pass1    = document.getElementById('regPassword').value.trim();
+    const pass2    = document.getElementById('confirmPassword').value.trim();
+
+    if (!/^[A-Za-z0-9_]+$/.test(username)) {
+      passwordMismatch.textContent = 'Username: English letters, numbers, underscores only.';
+      isRegistering = false; // Reset flag on error
       return;
     }
-    if (pass1.length < 8) {
-      passwordMismatch.textContent = 'Password must be at least 8 characters long.';
+    if (pass1.length < 6) {
+      passwordMismatch.textContent = 'Password must be at least 6 characters.';
+      isRegistering = false; // Reset flag on error
       return;
     }
     if (pass1 !== pass2) {
       passwordMismatch.textContent = 'Passwords do not match.';
-      return;
-    }
-    if (findUser(username)) {
-      passwordMismatch.textContent = 'Username already exists.';
+      isRegistering = false; // Reset flag on error
       return;
     }
 
-    // Register new user
-    const users = getUsers();
-    users.push({ username, password: pass1, score: 0 });
-    saveUsers(users);
-
-    // Initialize progress: unlock easy by default for all categories
-    const categories = getAllCategoriesFromQuestions();
-    const initial = {};
-    categories.forEach(c => initial[c] = ['easy']); // easy unlocked by default for all categories
-    saveUserProgress(username, initial);
-
-    // Log in and redirect
-    saveCurrentUser(username);
-    window.location.href = 'main.html';
+    try {
+        const result = await registerUser(email, username, pass1);
+        if (result.success) {
+           // Redirect ONLY after successful DB write
+           window.location.href = 'main.html';
+        } else {
+           passwordMismatch.textContent = result.message;
+           isRegistering = false; // Reset flag on failure
+        }
+    } catch (err) {
+        console.error(err);
+        isRegistering = false;
+    }
   });
 
-  // Handle login submission
-  loginForm?.addEventListener('submit', (e) => {
+  // Handle Login
+  loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const username = document.getElementById('loginUsername').value.trim();
+    if(loginError) {
+        loginError.textContent = 'Logging in...';
+        loginError.style.color = '#ff6f61';
+    }
+    
+    const input = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
-    const user = findUser(username);
-    const loginError = document.getElementById('loginError');
 
-    if (user && user.password === password) {
-      saveCurrentUser(username);
+    const result = await loginUser(input, password);
+    if (result.success) {
       window.location.href = 'main.html';
     } else {
-      if (loginError) loginError.textContent = 'Invalid username or password.';
+      loginError.textContent = result.message || 'Invalid credentials.';
+    }
+  });
+
+  // Handle Forgot Password
+  forgotLink?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = prompt("Please enter your email address to reset your password:");
+    if (email && email.includes('@')) {
+      const res = await resetUserPassword(email);
+      if (res.success) {
+        alert("Password reset email sent! Check your inbox.");
+      } else {
+        alert("Error: " + res.message);
+      }
+    } else if (email) {
+      alert("Please enter a valid email.");
     }
   });
 }
 
-/* ---------------- Main Page ---------------- */
+/* ---------------- Main Page Logic (Welcome Feature) ---------------- */
 
-function initMainPage(current) {
-  const user = findUser(current);
-  // If user not found (e.g., deleted), log out and redirect
-  if (!user) { saveCurrentUser(null); window.location.href = 'index.html'; return; }
+async function checkAndShowWelcomeMessage(user) {
+  if (user && user.uid && !user.hasSeenWelcome) {
+    const overlay = $('#welcomeOverlay');
 
-  setHeaderProfileImage(current);
-  initHeader();
+    if (!overlay) {
+      console.warn("Welcome overlay element not found in main.html.");
+      return;
+    }
 
-  const start = $('#mainStartBtn');
-  if (start) start.addEventListener('click', () => window.location.href = 'game.html');
+    overlay.classList.remove('hidden-welcome');
+    
+    const handleDismiss = async () => {
+      overlay.classList.add('hidden-welcome');
+      try {
+        await db.collection('users').doc(user.uid).update({ 
+          hasSeenWelcome: true 
+        });
+        user.hasSeenWelcome = true;
+      } catch (e) {
+        console.error("Error updating welcome flag:", e);
+      }
+    };
+    
+    overlay.addEventListener('click', handleDismiss, { once: true }); 
+  }
 }
+
+function initMainPage(currentUser) {
+  setHeaderProfileImage(currentUser);
+  initHeader(currentUser);
+  const start = $('#mainStartBtn');
+  if (start) { 
+    const newStart = start.cloneNode(true);
+    start.parentNode.replaceChild(newStart, start);
+    newStart.addEventListener('click', () => window.location.href = 'game.html');
+  }
+  
+  checkAndShowWelcomeMessage(currentUser);
+}
+
 
 /* ---------------- Leaderboard Page ---------------- */
 
-function initLeaderboardPage(current) {
-  setHeaderProfileImage(current);
-  initHeader();
+async function initLeaderboardPage(currentUser) {
+  setHeaderProfileImage(currentUser);
+  initHeader(currentUser);
 
   const podium = document.getElementById('podium');
   const list   = document.getElementById('leaderboard-list');
   if (!podium || !list) return;
 
-  // Get users and sort by score descending
-  const users = getUsers().slice().sort((a,b)=>(b.score||0)-(a.score||0));
+  list.innerHTML = '<li style="text-align:center">Loading leaderboard...</li>';
+  const users = await getLeaderboardData();
 
   const top3   = users.slice(0,3);
   const others = users.slice(3);
 
-  // Render Top 3 Podium
+  // Render Top 3
   podium.innerHTML = '';
-  // The desired display order is 2nd, 1st, 3rd.
   const classes = ['second','first','third'];
   const order   = [top3[1] || null, top3[0] || null, top3[2] || null];
 
   order.forEach((u, idx) => {
     if (!u) return;
-    const img = localStorage.getItem(profileImgKey(u.username)) || DEFAULT_AVATAR;
     const slot = document.createElement('div');
     slot.className = `slot ${classes[idx]}`;
-    // Rank logic: idx=0 is 2nd, idx=1 is 1st, idx=2 is 3rd
     const rank = idx===0 ? 2 : idx===1 ? 1 : 3;
     slot.innerHTML = `
       <div class="avatar-wrap">
-        <img class="avatar-lg" src="${img}" alt="avatar">
+        <img class="avatar-lg" src="${u.photoURL || DEFAULT_AVATAR}" alt="avatar">
         <span class="rank-badge">${rank}</span>
       </div>
       <div class="name">${u.username}</div>
@@ -187,135 +240,154 @@ function initLeaderboardPage(current) {
     podium.appendChild(slot);
   });
 
-  // Pagination for other users
-  const USERS_PER_PAGE = 10;
-  let currentPage = 1;
-  const totalPages = Math.max(1, Math.ceil(others.length / USERS_PER_PAGE));
-  const listEl = list; // Renamed to listEl for clarity inside function
-
-  function renderPage(page) {
-    listEl.innerHTML = '';
-    const start = (page - 1) * USERS_PER_PAGE;
-    const pageUsers = others.slice(start, start + USERS_PER_PAGE);
-
-    pageUsers.forEach((u, i) => {
-      // Ranks start from 4 after the top 3
-      const rank = start + i + 4;
-      const li = document.createElement('li');
-      if (u.username === current) li.classList.add('current-user');
-      li.innerHTML = `
-        <span class="rank">${rank}</span>
-        <div class="player">
-          <img class="avatar" src="${localStorage.getItem(profileImgKey(u.username)) || DEFAULT_AVATAR}" alt="avatar">
-          <div class="player-info en">
-            <span class="meta">${u.username === current ? 'You' : 'Player'}</span>
-            <span class="name">${u.username}</span>
-          </div>
+  // Render List
+  list.innerHTML = '';
+  others.forEach((u, i) => {
+    const rank = i + 4;
+    const li = document.createElement('li');
+    if (currentUser && u.username === currentUser.username) li.classList.add('current-user');
+    li.innerHTML = `
+      <span class="rank">${rank}</span>
+      <div class="player">
+        <img class="avatar" src="${u.photoURL || DEFAULT_AVATAR}" alt="avatar">
+        <div class="player-info en">
+          <span class="meta">${(currentUser && u.username === currentUser.username) ? 'You' : 'Player'}</span>
+          <span class="name">${u.username}</span>
         </div>
-        <span class="score">${u.score || 0}</span>
-      `;
-      listEl.appendChild(li);
-    });
-
-    // Render pagination controls
-    const pagination = document.getElementById('pagination');
-    if (pagination) {
-      pagination.innerHTML = '';
-      if (totalPages > 1) {
-        if (page > 1) {
-          const prev = document.createElement('button');
-          prev.textContent = '← Back';
-          prev.className = 'page-btn';
-          prev.addEventListener('click', () => { currentPage--; renderPage(currentPage); });
-          pagination.appendChild(prev);
-        }
-        const pageInfo = document.createElement('span');
-        pageInfo.textContent = `Page ${page} / ${totalPages}`;
-        pagination.appendChild(pageInfo);
-        if (page < totalPages) {
-          const next = document.createElement('button');
-          next.textContent = 'Next →';
-          next.className = 'page-btn';
-          next.addEventListener('click', () => { currentPage++; renderPage(currentPage); });
-          pagination.appendChild(next);
-        }
-      }
-    }
-  }
-
-  renderPage(currentPage);
+      </div>
+      <span class="score">${u.score || 0}</span>
+    `;
+    list.appendChild(li);
+  });
 }
 
 /* ---------------- Profile Page ---------------- */
 
-function initProfilePage(current) {
-  const user = findUser(current);
-  if (!user) { saveCurrentUser(null); window.location.href = 'index.html'; return; }
-
-  setHeaderProfileImage(current);
-  initHeader();
+async function initProfilePage(currentUser) {
+  setHeaderProfileImage(currentUser);
+  initHeader(currentUser);
 
   const uname  = $('#profile-username');
   const score  = $('#profile-score');
   const pic    = $('#profile-pic');
   const file   = $('#profile-file');
   const change = $('#change-pic');
+  const playedEl = $('#profile-games-played');
+  const rankEl   = $('#profile-rank');
 
-  if (uname) uname.textContent = user.username;
-  if (score) score.textContent = user.score || 0;
+  if (uname) uname.textContent = currentUser.username;
+  if (score) score.textContent = currentUser.score || 0;
+  if (playedEl) playedEl.textContent = currentUser.gamesPlayed || 0;
+  if (pic) pic.src = currentUser.photoURL || DEFAULT_AVATAR;
 
-  // Load and display current profile picture
-  const stored = localStorage.getItem(profileImgKey(current));
-  if (pic) pic.src = stored || DEFAULT_AVATAR;
+  if (rankEl) {
+    rankEl.textContent = "Loading...";
+    const r = await getUserRank(currentUser.uid);
+    rankEl.textContent = r;
+  }
 
-  // Handle profile picture change
   if (change && file) {
-    change.addEventListener('click', () => file.click()); // Click hidden file input
-    file.addEventListener('change', (e) => {
+    const newChange = change.cloneNode(true);
+    change.parentNode.replaceChild(newChange, change);
+    
+    const newFile = file.cloneNode(true);
+    file.parentNode.replaceChild(newFile, file);
+    
+    newChange.addEventListener('click', () => newFile.click());
+
+    newFile.addEventListener('change', async (e) => {
       const f = e.target.files?.[0];
       if (!f) return;
-      
-      // Read file as Data URL
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        // Save to localStorage
-        localStorage.setItem(profileImgKey(current), dataUrl);
-        // Update displayed image on page
-        if (pic) pic.src = dataUrl;
-        // Update header image
-        setHeaderProfileImage(current);
-      };
-      reader.readAsDataURL(f);
+
+      newChange.style.opacity = 0.5;
+      newChange.style.cursor = 'wait';
+
+      try {
+        const newUrl = await uploadUserProfileImage(currentUser.uid, f);
+        
+        if (newUrl) {
+          if (pic) pic.src = newUrl;
+          setHeaderProfileImage({ ...currentUser, photoURL: newUrl }); 
+          alert("Profile picture updated successfully!");
+        } else {
+          alert("Failed to upload image. Check console for details.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error uploading image.");
+      } finally {
+        newChange.style.opacity = 1;
+        newChange.style.cursor = 'pointer';
+        newFile.value = ''; 
+      }
     });
   }
 }
 
-
-/* ---------------- Simple Router ---------------- */
+/* ---------------- Routing Logic ---------------- */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Read the page type from the body's data attribute
-  const page = document.body.getAttribute('data-page'); // auth | main | game | leaderboard | profile
-  const cur  = getCurrentUser();
+  const page = document.body.getAttribute('data-page');
 
-  if (page === 'auth') {
-    initAuthPage();
-    return;
-  }
+  auth.onAuthStateChanged(async (firebaseUser) => {
+    
+    // 1. AUTH PAGE (Login/Register)
+    if (page === 'auth') {
+      if (firebaseUser) {
+         // CRITICAL FIX: If we are actively registering, DO NOT redirect yet.
+         // Let the register function finish writing to the DB and handle the redirect.
+         if (isRegistering) {
+             console.log("Registration in progress... waiting for DB write.");
+             return;
+         }
 
-  // Authentication check for protected pages
-  if (!cur) {
-    // For pages other than index/auth, redirect to index
-    if (page !== 'index') {
+         // Otherwise, user is just normally logged in, so redirect.
+         window.location.href = 'main.html';
+      } else {
+         initAuthPage(); 
+      }
+      return;
+    }
+
+    // 2. PROTECTED PAGES
+    if (!firebaseUser) {
       window.location.href = 'index.html';
       return;
     }
-  }
-  
-  // Initialize specific page logic
-  if (page === 'main')        initMainPage(cur);
-  else if (page === 'game')   initGamePage(cur);
-  else if (page === 'leaderboard') initLeaderboardPage(cur);
-  else if (page === 'profile')     initProfilePage(cur);
+
+    // 3. User is found, now get their data
+    let doc = await db.collection('users').doc(firebaseUser.uid).get();
+    
+    // Auto-repair logic (This was running too early before)
+    if (!doc.exists) {
+       console.log("Account data missing. Auto-repairing...");
+       try {
+         const defaultData = {
+            username: firebaseUser.email ? firebaseUser.email.split('@')[0] : "Agent",
+            email: firebaseUser.email,
+            score: 0,
+            gamesPlayed: 0,
+            progress: {},
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            photoURL: 'images/default-avatar.png',
+            hasSeenWelcome: false,
+            seenExplanations: {}
+         };
+         await db.collection('users').doc(firebaseUser.uid).set(defaultData);
+         doc = await db.collection('users').doc(firebaseUser.uid).get();
+       } catch (err) {
+         console.error("Auto-repair failed:", err);
+         alert("There is a problem with your account data. Please re-register.");
+         auth.signOut();
+         return;
+       }
+    }
+    
+    const fullUserData = { uid: firebaseUser.uid, ...doc.data() };
+
+    if (page === 'main')        initMainPage(fullUserData);
+    else if (page === 'game')   initGamePage(fullUserData);
+    else if (page === 'leaderboard') initLeaderboardPage(fullUserData);
+    else if (page === 'profile')     initProfilePage(fullUserData);
+  });
 });

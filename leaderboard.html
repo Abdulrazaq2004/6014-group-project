@@ -1,29 +1,37 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl"> <!-- Arabic language, right-to-left layout -->
 <head>
+  <!-- Meta: character encoding and responsive layout -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cyber6014 Game — Leaderboard</title>
+  <title>Cyber6014 — Leaderboard</title>
 
-  <!-- Global Styles -->
+  <!-- Firebase SDKs (compat versions for auth, db, and storage) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
+
+  <!-- Global styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body data-page="leaderboard">
-  <!-- 🔹 Header -->
+  <!-- 🔹 Header Section -->
   <header class="site-header">
     <div class="header-left">
-      <!-- Back to main menu -->
+      <!-- Button to return to the main page -->
       <a class="header-btn" href="main.html">Return</a>
     </div>
 
-    <h1 class="site-title">Cyber6014 Game</h1>
+    <!-- Application title -->
+    <h1 class="site-title">Cyber6014</h1>
 
     <div class="header-right profile-menu">
-      <!-- Profile picture -->
+      <!-- User profile avatar -->
       <img id="headerProfilePic" class="profile-icon" src="images/default-avatar.png" alt="Profile" />
 
-      <!-- Dropdown for profile and sign-out -->
+      <!-- Profile menu (profile link + logout) -->
       <nav id="profileDropdown" class="dropdown">
         <a href="profile.html">Profile</a>
         <button id="logoutBtn" type="button" class="danger">Sign Out</button>
@@ -31,34 +39,34 @@
     </div>
   </header>
 
-  <!-- 🔹 Leaderboard Content -->
+  <!-- 🔹 Main Leaderboard Content -->
   <main class="page-wrap">
     <div class="panel">
+      <!-- Page title -->
       <h1>Leaderboard</h1>
 
-      <!-- 🥇 Podium Top 3 -->
+      <!-- 🥇 Podium for Top 3 players (rendered dynamically) -->
       <section id="podium" class="podium"></section>
 
-      <!-- 🔢 Other ranked players -->
+      <!-- 🔢 Full list of ranked players (starts from rank #4) -->
       <ol id="leaderboard-list" class="leaderboard-list"></ol>
 
-      <!-- Pagination controls (if needed) -->
+      <!-- Pagination buttons (optional if leaderboard is long) -->
       <div id="pagination" class="pagination-controls"></div>
     </div>
   </main>
 
   <!-- 🔹 Footer -->
   <footer class="site-footer">
-    Cyber6014 Game – Developed with love by 6014 group © 2025
+    Cyber6014 – Developed with love by 6014 group © 2025
   </footer>
 
-  <!-- 🔹 Scripts -->
-<script src="js/questionsData.js"></script>
-<script src="js/config_and_helpers.js"></script>
-<script src="js/user_manager.js"></script>
-<script src="js/progress_manager.js"></script>
-<script src="js/game_logic.js"></script>
-<script src="js/ui_and_routing.js"></script>
-
+  <!-- 🔹 Script Includes -->
+  <script src="js/questionsData.js"></script>
+  <script src="js/config_and_helpers.js"></script>
+  <script src="js/user_manager.js"></script>
+  <script src="js/progress_manager.js"></script>
+  <script src="js/game_logic.js"></script>
+  <script src="js/ui_and_routing.js"></script>
 </body>
 </html>

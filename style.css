@@ -33,6 +33,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: var(--header-h);
 }
 
 /* Header */
@@ -235,6 +236,11 @@ a:hover{filter:brightness(1.2)}
   width: 90%;
   max-width: 1800px;
   margin: 40px auto;
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px var(--space); /* Use space variable for side padding */
+  margin: 0 auto;
 }
 
 .game-wrap2 {
@@ -339,7 +345,7 @@ button:hover{transform:translateY(-1px);box-shadow:0 0 24px var(--color-primary)
 }
 
 
-/* 🧩 Difficulty Legend */
+/*  Difficulty Legend */
 .difficulty-legend {
   margin-top: 10px;
   background: rgba(0, 0, 0, 0.15);
@@ -868,8 +874,8 @@ button:hover{transform:translateY(-1px);box-shadow:0 0 24px var(--color-primary)
 /* Categories Grid (3x3 layout) */
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 82px;
   justify-items: center;
   margin-top: 40px;
 }
@@ -966,3 +972,441 @@ button:hover{transform:translateY(-1px);box-shadow:0 0 24px var(--color-primary)
 .hidden {
   display: none !important;
 }
+
+
+
+
+/* =========================================
+   NEW PROFILE PAGE DESIGN
+   ========================================= */
+
+/* Center the card on the page */
+.profile-card-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: rgba(30, 37, 51, 0.6); /* Semi-transparent dark base */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 40px auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+/* Decorative Top Banner */
+.profile-header-bg {
+  height: 120px;
+  background: linear-gradient(135deg, var(--color-bg1), var(--color-surface));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+/* Main Content Area */
+.profile-content {
+  padding: 0 30px 40px;
+  text-align: center;
+  position: relative;
+  top: -60px; /* Pulls content up to overlap the banner */
+}
+
+/* Avatar Styling */
+.avatar-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 15px;
+}
+
+#profile-pic {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--color-bg1); /* Matches background to look "cut out" */
+  box-shadow: 0 0 0 4px var(--color-primary), 0 10px 20px rgba(0,0,0,0.3);
+  background: #1e2533;
+}
+
+/* Edit Pencil Button */
+.edit-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  border: 2px solid var(--color-bg1);
+  color: white;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  padding: 0; /* Reset padding */
+}
+.edit-btn:hover {
+  transform: scale(1.1);
+  background: #ffa726;
+}
+
+/* Username Text */
+.username-display {
+  font-size: 2rem;
+  color: white;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+}
+
+.user-rank {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  margin-top: 5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.2s;
+}
+
+.stat-box:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-3px);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+/* Buttons at the bottom */
+.profile-actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.btn-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(0, 188, 212, 0.05);
+}
+
+/* ---------------- Clean Minimal Welcome Bubble (No glow, no box, no bg) ---------------- */
+
+.welcome-overlay {
+  position: fixed;
+  bottom: -100px;
+  left: 50px;
+
+  /* no background at all */
+  background: none !important;
+
+  /* increased size by scaling container instead of image distortion */
+  transform: scale(1.2);
+
+  /* no padding or border */
+  padding: 0;
+  border: none;
+
+  /* keep it flexible */
+  width: auto;
+  height: auto;
+
+  /* fast fade animation */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s;
+
+  /* allow clicks to pass through */
+  pointer-events: none;
+
+  z-index: 9999;
+}
+
+/* The image itself receives click events */
+.welcome-overlay img {
+
+  /* REMOVE ALL effects */
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+/* Hidden state */
+.welcome-overlay.hidden-welcome {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Hover: make the image bigger smoothly */
+.welcome-overlay img {
+  pointer-events: auto;
+  max-width: 600px;
+  max-height: 600px;
+  cursor: pointer;
+
+  /* smooth transition */
+  transition: transform 0.25s ease-in-out;
+}
+
+/* On hover → enlarge */
+.welcome-overlay img:hover {
+  transform: scale(1.02); /* increase image size by ~18% */
+}
+
+
+
+
+.image-option {
+  display: inline-block;
+  margin: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.image-option:hover {
+  transform: scale(1.05);
+}
+.quiz-image {
+  width: 220px;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid transparent;
+}
+.image-option.correct .quiz-image {
+  border-color: limegreen;
+}
+.image-option.wrong .quiz-image {
+  border-color: red;
+}
+
+
+
+.main-question-image {
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  margin: 0 auto 30px;
+  border-radius: 12px;
+  pointer-events: none; /* unclickable */
+  user-select: none;
+}
+
+
+
+
+#question-image {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 30px;
+}
+
+.main-question-image {
+  max-width: 800px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  pointer-events: none;
+  user-select: none;
+  box-shadow: 0 0 15px rgba(0,0,0,0.25);
+}
+
+.option-btn.selected {
+  background-color: rgba(0, 255, 200, 0.15);
+  border: 2px solid #00ffc8;
+}
+
+
+.main-question-image {
+  display: block;
+  margin: 0 auto 25px;
+  max-width: 650px;
+  width: 80%;
+  height: auto;
+  border-radius: 10px;
+  pointer-events: none;
+  user-select: none;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.25);
+}
+
+
+/* */
+/* ================= POPUP EXPLANATION STYLES ================= */
+.feedback-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85); /* Dark background */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999; /* On top of everything */
+  animation: fadeIn 0.3s ease-out;
+  cursor: pointer;
+}
+
+
+
+
+.feedback-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  text-align: center;
+}
+
+.feedback-image {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+}
+
+.tap-to-close {
+  margin-top: 15px;
+  color: #fff;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 1.2rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+
+
+
+/* ===== MOBILE RESPONSIVE FIXES ===== */
+@media (max-width: 768px) {
+  /* General layout */
+  body {
+    font-size: 16px;
+    overflow-x: hidden;
+  }
+
+  header.site-header, footer.site-footer {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .header-left, .header-right {
+    margin: 6px 0;
+  }
+
+  /* Game and main screens */
+  .main-container, .game-wrap2, .page-wrap {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .sidebar-info {
+    width: 100%;
+    order: 2;
+    margin-top: 20px;
+  }
+
+  .main-content, .question-box {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .answers-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .option-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Category and difficulty buttons */
+  .category-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .difficulty-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .difficulty-btn {
+    width: 80%;
+    margin: 6px 0;
+  }
+
+  /* Profile & leaderboard */
+  .profile-card-container, .panel {
+    width: 95%;
+    padding: 10px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .podium {
+    flex-direction: column;
+  }
+
+  .leaderboard-list {
+    padding: 0 10px;
+  }
+
+  /* Welcome overlays and popups */
+  .welcome-overlay img,
+  .feedback-image {
+    max-width: 90%;
+    height: auto;
+  }
+}
+/* ================= End of style ================= */

@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl"> <!-- Arabic language with right-to-left direction -->
 <head>
+  <!-- Meta settings for encoding and responsive design -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cyber6014 Game — Main</title>
+  <title>Cyber6014 — Main</title>
 
-  <!-- Global Styles -->
+  <!-- Firebase SDKs (compat versions for backwards compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
+
+  <!-- External stylesheet for layout and styling -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -13,17 +20,18 @@
   <!-- 🔹 Header -->
   <header class="site-header">
     <div class="header-left">
-      <!-- Link to leaderboard -->
+      <!-- Link to view leaderboard -->
       <a class="header-btn" href="leaderboard.html">Leaderboard</a>
     </div>
 
-    <h1 class="site-title">Cyber6014 Game</h1>
+    <!-- Site branding -->
+    <h1 class="site-title">Cyber6014</h1>
 
     <div class="header-right profile-menu">
-      <!-- User profile picture -->
+      <!-- Profile avatar -->
       <img id="headerProfilePic" class="profile-icon" src="images/default-avatar.png" alt="Profile" />
 
-      <!-- Dropdown menu for profile & logout -->
+      <!-- Dropdown with profile and logout -->
       <nav id="profileDropdown" class="dropdown">
         <a href="profile.html">Profile</a>
         <button id="logoutBtn" type="button" class="danger">Sign Out</button>
@@ -31,24 +39,30 @@
     </div>
   </header>
 
-  <!-- 🔹 Main Content -->
+  <!-- 🔹 Main content -->
   <main class="main-container">
+    <!-- Title and call to action -->
     <h2 class="hero-title">Learn and Compete</h2>
+    <!-- Start button to begin the game -->
     <button id="mainStartBtn" class="big-start-btn">Start</button>
   </main>
 
+  <!-- 🔹 Welcome overlay (optional introductory image) -->
+  <div id="welcomeOverlay" class="welcome-overlay hidden-welcome">
+    <img id="welcomeImage" src="images/welcome.png" alt="Welcome! Click to dismiss." />
+  </div>
+
   <!-- 🔹 Footer -->
   <footer class="site-footer">
-    Cyber6014 Game – Developed with love by 6014 group © 2025
+    Cyber6014 – Developed with love by 6014 group © 2025
   </footer>
 
-  <!-- Scripts -->
-<script src="js/questionsData.js"></script>
-<script src="js/config_and_helpers.js"></script>
-<script src="js/user_manager.js"></script>
-<script src="js/progress_manager.js"></script>
-<script src="js/game_logic.js"></script>
-<script src="js/ui_and_routing.js"></script>
-
+  <!-- 🔹 JavaScript functionality and app logic -->
+  <script src="js/questionsData.js"></script>
+  <script src="js/config_and_helpers.js"></script>
+  <script src="js/user_manager.js"></script>
+  <script src="js/progress_manager.js"></script>
+  <script src="js/game_logic.js"></script>
+  <script src="js/ui_and_routing.js"></script>
 </body>
 </html>

@@ -1,35 +1,46 @@
 /* ================================
-   CYBER6014 GAME - PROGRESS MANAGER
+   CYBER6014 GAME - PROGRESS MANAGER (FIREBASE)
    ================================ */
 
-/* ---------------- Progress helpers ---------------- */
+/* NOTE: Progress is now stored inside the user's document in Firestore
+   under the field 'progress'. 
+   Structure: { "Phishing": ["easy", "medium"], "Social media": ["easy"] }
+*/
 
-/** Loads the progress object for a specific user. */
-function loadUserProgress(username) {
-  if (!username) return {};
-  const raw = localStorage.getItem(progressKey(username));
-  try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
-}
+/** * Unlocks a specific difficulty for a category in Firestore.
+ * Also updates the local object so the UI refreshes instantly.
+ */
+async function unlockDifficultyInFirebase(currentUser, category, difficulty) {
+  if (!currentUser || !currentUser.uid) return;
 
-/** Saves the progress object for a specific user. */
-function saveUserProgress(username, obj) {
-  if (!username) return;
-  localStorage.setItem(progressKey(username), JSON.stringify(obj || {}));
-}
+  const uid = currentUser.uid;
+  
+  // 1. Get current progress or init empty
+  let currentProgress = currentUser.progress || {};
+  
+  // 2. Get array for this category or init empty
+  let catProgress = currentProgress[category] || [];
 
-/** Checks if a specific difficulty for a category is unlocked. (Not used in current flow but kept for consistency) */
-function isDifficultyUnlocked(username, category, difficulty) {
-  const p = loadUserProgress(username);
-  const cat = p[category] || [];
-  return cat.includes(difficulty);
-}
+  // 3. If already unlocked, do nothing
+  if (catProgress.includes(difficulty)) {
+    return;
+  }
 
-/** Unlocks a specific difficulty for a category for the user. */
-function unlockDifficulty(username, category, difficulty) {
-  const p = loadUserProgress(username);
-  if (!p[category]) p[category] = [];
-  if (!p[category].includes(difficulty)) {
-    p[category].push(difficulty);
-    saveUserProgress(username, p);
+  // 4. Add new difficulty
+  catProgress.push(difficulty);
+  
+  // 5. Update local object (for immediate UI update)
+  if (!currentUser.progress) currentUser.progress = {};
+  currentUser.progress[category] = catProgress;
+
+  // 6. Update Firestore
+  // We use dot notation "progress.CategoryName" to update just that field
+  try {
+    await db.collection('users').doc(uid).update({
+      [`progress.${category}`]: catProgress
+    });
+    console.log(`Unlocked ${difficulty} for ${category}`);
+  } catch (e) {
+    console.error("Error unlocking difficulty:", e);
   }
 }
