@@ -3,7 +3,7 @@ Cyber6014 Game – System README
 
 The Cyber6014 Game can be accessed in two ways:
 
-Option 1: Online (Recommended)
+Option 1: Online (Recommended on EDGE)
 The system is hosted online and can be accessed using the following link:
 https://cyber6014.web.app/
 
